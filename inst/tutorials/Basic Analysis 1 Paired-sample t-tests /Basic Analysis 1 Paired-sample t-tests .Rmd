@@ -27,7 +27,6 @@ graveyard <- c(1:6, 1:6)
 treatment <- c("control", "shaded") %>% rep(., each = 6) %>% as.factor()
 ants <- c(57, 9, 3, 27, 2, 11, 34, 7, 3, 9, 0, 0)
 fruiting <- c(19, 3, 1, 12,1,5,8,2,0,6,0,0)
-# fruiting <- c(25, 9, 1, 18, 1, 11, 13, 6, 0, 11, 0, 2)
 
 ant_data <- data.frame(graveyard, treatment, ants, fruiting)
 
@@ -252,15 +251,24 @@ t.test(ant_data$VARIABLE1 ~ ant_data$VARIABLE2, paired = TRUE)
 
 t.test(ant_data$fruiting ~ ant_data$treatment, paired = TRUE)
 ```
+
+
 ```{r quiz1, echo=FALSE}
 quiz(caption = "Paired t-tests quiz",
   question("Which of the following statements are correct?",
     answer("The difference between the means is not statistically significant at the p<0.05 level", correct = TRUE),
     answer("The difference between the means is statistically significant at the p<0.05 level", message = "Answer 2. Because the calculated p-value is greater than 0.05 we reject the null hypothesis and accept the alternative. Conventionally this means that we have a statistically significant difference"),
-    answer("Because p<0.05 we are unable to reject the null hypothesis", correct = TRUE),
+    answer("Because p>0.05 we are unable to reject the null hypothesis", correct = TRUE),
     answer("Because p<0.05 we cautiously reject the null hypothesis and reject the alternative"),
     answer("A statistically significant result means that we can be sure that there is a real effect", message = "Answer 5. A statistically significant result tells you nothing about how 'real' an effect might be. It only tells you the probability of observing your data if the null hypothesis were correct"),
     answer("A statistically non-significant result would mean that the means were the same", message = "Answer 6. A statistically non-significant result only tells us that we have little confidence that any observed difference is not a consequence of sampling error. It definietly does not mean that we can conclude that two means are the same.")
+  ),
+  
+  question("The p-values for both test are close to 0.05 and if you look at the data there certainly seems to be a pattern. What should we do?",
+           answer("We should do a few more replicates of the experiment and reanalyse with a larger sample size. If the result remains non-significant we carry on generating more data until the result is significant", message = "Answer 1. No. Adding extra data until you get a significant result is generally considered to be extremely poor practice."),
+           answer("We can conclude that there is some evidence for an effect of shading but we are not confident in this result", correct = TRUE),
+           answer("We should examine our data very carefully and look for any possible outliers or subgroups that we can remove to try to push the p-value into significance", message = "Answer 3. No. This is what we call *p-hacking* and is widely regarded as malpractice"),
+           answer("If we wanted to get a clearer answer to our question we should repeat the experiment with a larger sample size and analyse the new results separately to the old results", correct  = TRUE)
   ),
   
   question("Regarding the 95% confidence interval in the t-test results, which of the following are correct?",
@@ -275,8 +283,138 @@ quiz(caption = "Paired t-tests quiz",
 
 ## One-tailed versus two tailed tests
 
-If you were to look in the paper by Andriolli *et al.* which originally reported these data, you would find that their p-values are rather different from the ones we've calculated above. Whereas our analysis found that neither the overall number of ants (paired sample t-test, t = 2.39, 5df, p = 0.062) nor the number of ant cadavers with fruiting bodies (t = 2.39, 5df, p=0.062) differed significantly between the control and shaded areas, the paper by Andriolli et al reported that both were statistically significant with p-values of 0.031 and 0.026 respectively. How come?
+If you were to look in the paper by Andriolli *et al.* which originally reported these data, you would find that their p-values are rather different from the ones we've calculated above. Whereas our analysis found that neither the overall number of ants (paired sample t-test, t = 2.39, 5df, p = 0.062) nor the number of ant cadavers with fruiting bodies (t = 2.54, 5df, p=0.052) differed significantly between the control and shaded areas, the paper by Andriolli et al reported that both were statistically significant with p-values of 0.031 and 0.026 respectively. How come?
 
+Here's the plot of the probability density of *t* with the test statistic indicated and the areas within which we would expect to find the most extreme 5% of values.
+
+```{r echo = FALSE}
+
+# Set up dummy x-variable
+X1 <- seq(-4, 4, length.out = 200)
+
+# Calculate probability density of t for each value
+Y1 <- dt(X1, df = 5)
+
+# Draw curve
+plot(Y1 ~ X1, 
+     type = "l",
+     xlab = "",
+     ylab = "Probability density of t")
+
+# Add arrow and text indicating the location of our test statistic
+arrows(x0 = 2.385, y0 = 0.15, x1 = 2.385, y1 = 0.05, length = 0.1)
+
+text(x = 2.385, y = 0.185, labels = "Calculated value \nof t for the first \npaired t-test", adj = 0.5, cex = 0.8)
+
+
+# Draw in areas showing the upper and lower 2.5% quartiles
+x0 <- min(which(X1 >= qt(0.001, 5)))
+x1 <- min(which(X1 >= qt(0.025, 5)))
+x4 <- max(which(X1 <= qt(0.975, 5)))
+x5 <- max(which(X1 <= qt(0.999, 5)))
+
+
+polygon(
+  x = c(X1[c(x0, x0:x1, x1)]),
+  y = c(0, Y1[x0:x1], 0),
+  col = "#9ecae1",
+  border = NA
+)
+polygon(
+  x = c(X1[c(x4, x4:x5, x5)]),
+  y = c(0, Y1[x4:x5], 0),
+  col = "#9ecae1",
+  border = NA
+)
+
+
+```
+
+**Figure 3.** Probability density for the *t* distribution on 5 degrees of freedom. Blue shaded areas indicate the region within which the most extreme 5% of the values lie. The arrow indicates the value of *t* calculated for the first t-test, carried out on the data for the total number of ant cadavers found in the shaded and control areas. This value (2.385) is outside the area containing the most extreme 5% of values, indicating a non-significant result.
+
+You can see that the areas highlighted correspond to both extreme positive and extreme negative values: in other words, this is a *two-tailed* test and we would record a significant result if our value of *t* had a sufficiently high positive value or a sufficiently low negative value.  In the case of a t-test this means that we are not implying any directionality in our predictions, so we would record a significant result whether the effect was that group A had a higher mean than group B or a lower mean, so long as the difference was large enough.
+
+What if we had a strong *a priori* hypothesis that an effect should be directional, so our prediction would be (for a t-test) that one group should have a *larger* mean than the other? In that case, for the conventional theshold of statistical significance of p=0.05 we could only consider the area under the curve containing the largest 5% of our values of *t*, as shown here.
+
+```{r echo = FALSE}
+
+# Set up dummy x-variable
+X1 <- seq(-4, 4, length.out = 200)
+
+# Calculate probability density of t for each value
+Y1 <- dt(X1, df = 5)
+
+# Draw curve
+plot(Y1 ~ X1, 
+     type = "l",
+     xlab = "",
+     ylab = "Probability density of t")
+
+# Add arrow and text indicating the location of our test statistic
+arrows(x0 = 2.385, y0 = 0.15, x1 = 2.385, y1 = 0.05, length = 0.1)
+
+text(x = 2.385, y = 0.185, labels = "Calculated value \nof t for the first \npaired t-test", adj = 0.5, cex = 0.8)
+
+
+# Draw in areas showing the upper and lower 2.5% quartiles
+x0 <- min(which(X1 >= qt(0.001, 5)))
+x1 <- min(which(X1 >= qt(0.025, 5)))
+x4 <- max(which(X1 <= qt(0.975, 5)))
+x5 <- max(which(X1 <= qt(0.999, 5)))
+
+x6 <- max(which(X1 <= qt(0.95, 5)))
+
+polygon(
+  x = c(X1[c(x6, x6:x5, x5)]),
+  y = c(0, Y1[x6:x5], 0),
+  col = "#9ecae1",
+  border = NA
+)
+
+# polygon(
+#   x = c(X1[c(x0, x0:x1, x1)]),
+#   y = c(0, Y1[x0:x1], 0),
+#   col = "#9ecae1",
+#   border = NA
+# )
+# 
+# polygon(
+#   x = c(X1[c(x4, x4:x5, x5)]),
+#   y = c(0, Y1[x4:x5], 0),
+#   col = "#9ecae1",
+#   border = NA
+# )
+
+
+```
+
+**Figure 4.** Probability density for the *t* distribution on 5 degrees of freedom. The shaded area indicates the area containing the largest 5% of values. Note that the value of *t* calculated for the t-test on the total number of ant cadavers (2.385) is now within this region.
+
+This is an example of what we would call a *one-tailed test* because we are *only* considering one tail of the t-distribution. Is this what accounts for the difference between our results and the published results? 
+
+Here is the code for the first t-test, on the total number of ant cadavers. Try to modify it to do a one-tailed test. We can do a one-tailed test by adding the argument `alternative = "greater"` to our `t.test()` function call (for the hypothesis that one mean is *less* than another we would use `alternative  = less`).
+
+```{r one_tailed1, exercise = TRUE}
+t.test(ant_data$ants ~ ant_data$treatment, paired = TRUE)
+```
+
+```{r one_tailed1-solution}
+t.test(ant_data$ants ~ ant_data$treatment, paired = TRUE, alternative  = "greater")
+```
+
+Now do the same for the second t-test, on the numbers of cadavers with fruiting bodies.
+
+```{r one_tailed2, exercise = TRUE}
+t.test(ant_data$fruiting ~ ant_data$treatment, paired = TRUE)
+```
+
+```{r one_tailed2-solution}
+t.test(ant_data$fruiting ~ ant_data$treatment, paired = TRUE, alternative  = "greater")
+```
+
+Now we have replicated the analysis from the paper and the p-values are the same. Note that the values of *t* and the degrees of freedom are unchanged from our previous analyses: it is only the p-values and the confidence intervals for the difference that have changed.
+
+Were the authors justified in using a one-tailed test in this study? You can make your own mind up on this matter. Most researchers are very cautious about using one tailed tests because they are less conservative (i.e. more likely to give a significant result) than two-tailed tests, and because of a general feeling in the community that people only use one-tailed tests to get significant results when their two-tailed tests don't. As a rule of thumb, you should only use a one-tailed test when your hypothesis has a strong directional element and when your decision to use a one-tailed test was made *before analysing your data*. Ideally you should have some written record of this decision in case you are challenged on the matter later.
 
 
 

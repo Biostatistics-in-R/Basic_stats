@@ -1,0 +1,38 @@
+---
+title: "Basic Analysis 2: Two-sample t-tests"
+output: 
+  learnr::tutorial:
+    progressive: false
+    theme: cerulean
+    highlight: pygments
+    css: css/test.css
+    code_folding: hide
+runtime: shiny_prerendered
+author: Rob Knell
+description: >
+  The two-sample t-test is the "classic" t-test which allows us to compare the means between two groups of observations. 
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE, comment = NA, fig.width = 5, fig.height = 5)
+
+
+library(ggplot2)
+library(dplyr)
+```
+
+
+## Two sample t-tests explained
+
+In the previous tutorial we looked at the paired-sample t-test. This is a test carried out when we are comparing *paired* observations and the null hypothesis is that the mean difference between pairs of observations is zero. In the more common case of unpaired data we use the two-sample t-test, with the null hypothesis being that the difference between the means for the two groups is equal to zero. This video explains how the two-sample t-test works and how it differs from the paired-sample t-test.
+
+## Exercise: costs of reproduction in a cooperative breeder
+
+Reproduction is costly to the individuals reproducing: this is widely accepted in biology and, of course, obvious to anyone who has ever had children. The nature of these costs is not always clear, however --- in addition to straightforward costs in terms of energy and resources used there might be other costs incurred because of the degree of stress that reproducing organisms often experience. One aspect of this is potential oxidative damage caused when reactive oxygen species damage proteins, lipids and DNA. Normally these reactive oxygen species are kept at low levels by the body's built in system of antioxidant defences, but during periods of stress this system might function less efficiently leading to increased oxidative damage during these periods.
+
+Data on the role of oxidative stress during breeding is rare, especially from field systems, but in 2015 Cram and co-authors^1^ published a study of the white-browed sparrow weaver, *Plocepasser mahali* which addressed this. White-browed sparrow weavers are cooperatively breeding Southern African birds which live in groups of 2-12 birds. One pair in each group is the dominant pair which monopolises breeding, and the other birds provide assistance by heloing provision the young as well as assisting with other tasks.
+
+PHOTO
+
+**Figure 1** White browed sparrow weaver. Photo copyright Peter Steward, released under an [Attribution Non-Commercial 2.0 Creative Commons license](https://creativecommons.org/licenses/by-nc/2.0/).
