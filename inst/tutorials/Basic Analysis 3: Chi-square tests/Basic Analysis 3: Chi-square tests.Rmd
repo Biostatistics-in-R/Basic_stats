@@ -212,9 +212,60 @@ Here, positive values indicate that there is a positive association: so cells wi
 
 Many reef fish have larval stages which develop in open water and only settle onto a reef as they develop towards adulthood. As part of this process they make choices about where to settle based on sensory cues that might include both visual and olfactory components. To try to understand this process, John Majoris and co-workers published a study in 2018^2^ in which they tested the habitat preferences of young neon gobies *Elacatinus lori* on the barrier reef in Belize. Adult *E. lori* live inside tube sponges, and Majoris *et al.* collected freshly settled *E. lori* individuals and carried out a series of choice tests to examine how they choose sponges to settle in.
 
-![](https://github.com/rjknell/Basic_stats/raw/master/inst/tutorials/Basic%20Analysis%203:%20Chi-square%20tests/E_lori.png){width="600"}
+![](https://github.com/rjknell/Basic_stats/raw/master/inst/tutorials/Basic%20Analysis%203:%20Chi-square%20tests/E_lori.png){width="400"}
 
+**Figure 1** Top panel: Neon goby, *Elacatinus lori*, wikimedia commons. Bottom panels: two yellow tube sponges, typical of the habitat where the fish lives. Photos from Majoris *et al*, 2018.
 
+These fish are found more often inhabiting a yellow sponge of a species called *Aplysina fistularis*, and more rarely in a similar species, *Agelas conifera*, which is brown in colour. As one part of the experiment, fish were presented with a choice between brown and yellow tube sponges. To investigate what senaory cues were important in the choice, some sponges were covered with a clear plastic cylinder, allowing visual information but not olfactory, and some were covered with a mesh, allowing olfactory cues but not visual. When both visual and olfactory cues were allowed, 25 fish chose one of the yellow sponges and 5 one of the brown ones. When visual cues only were allowed 21 chose a yellow sponge and 10 a brown one but when olfactory cues only were allowed, 11 fish chose one of the yellow sponges and 9 one of the brown ones.
+
+If the fish were choosing sponges at random we would expect that half of them would choose the yellow and half the brown sponges. Looking at these data there is certainly a bias towards yellow sponges when all cues or just visual cues are allowed, but how sure are we that this pattern hasn't arisen just by chance? 
+
+We can use a slightly different version of the chi-square test here which is used when we know what the expected frequency of our response variable is. In this case, if there were no choice operating we would expect the gobies to choose one of the brown sponges 50% of the time. To test whether the fish choice differs signficantly from this in the first case, with all visual cues allowed, we add an argument `p = c(0.5, 0.5)` to our `chisq.test()` function call. This tells `chisq.test()` to compare the observed frequencies with what would be expected were the probability of choosing a yellow or brown sponge equal. 
+
+```{r}
+# Test so see if preferences deviate from a 50/50
+# ratio when all sensory cues are allowed
+chisq.test(c(25,5), p = c(0.5, 0.5))
+```
+
+Note that since we are only dealing with two data points here I've just used the `c()` function to make a vector within the `chisq.test()` function call to input the data, rather than setting up an object separately. For the choice experiments where all cues were allowed, then, we have a highly significant pattern which is most unlikely to have arisen by chance. It seems that neon gobies have a strong preference for yellow sponges to live in.
+
+How about the other two cases? Try to repeat this analysis for the visual only and then olfactory only cases.
+
+```{r visual, exercise = TRUE}
+# Visual only
+
+```
+
+```{r visual-solution}
+# Visual only
+
+chisq.test(c(21,10), p = c(0.5, 0.5))
+```
+
+```{r olfactory, exercise = TRUE}
+# Olfactory only
+
+```
+
+```{r olfactory-solution}
+# Olfactory only
+
+chisq.test(c(11,9), p = c(0.5, 0.5))
+```
+
+Have a look at the results of all three chi-square tests and see if you can answer these questions.
+
+```{r quiz1, echo = FALSE}
+question("Which of the following statements are correct?",
+    answer("When olfactory cues only are allowed the difference between the means is not statistically significant",  message = "Answer 1. This is not a test comparing means (that's a t-test). We are comparing frequencies here."),
+    answer("When visual cues only are allowed there is a significant preference for yellow sponges",correct = TRUE),
+    answer("When olfactory cues only are allowed there is no significant preference for yello or brown sponges", correct = TRUE),
+    answer("These results tell us that these fish are using vision alone to make choices about their habitat", message = "Answer 4. That's not something we can infer from these results. There is certainly evidence that visual cues are important on the scale at which this experiment was conducted, but olfactory cues could be important at other times or scales, and auditory cues could potentially also be important"),
+    answer("The p-value of 0.66 for the olfactory only test tells us that there is no effect of olfaction in habitat choice", message = "Answer 5. We always have to be careful when interpreting non-significant results. This result tells us that we have not found any evidence that olfaction is important, but our inability to find evidence does not necessarily mean that there really is no effect"),
+        answer("Because the p-value for visual cues only is very close to 0.05 we have to be cautious about interpreting this result",  correct = TRUE)
+  )
+```
 
 <br><br><hr>
 
