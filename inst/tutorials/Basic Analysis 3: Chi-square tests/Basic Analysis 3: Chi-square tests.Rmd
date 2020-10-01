@@ -10,11 +10,13 @@ output:
 runtime: shiny_prerendered
 author: Rob Knell
 description: >
-  Chi-square tests are widely used to test assumptions about the distribution of counts (frequencies) of observations in different categories. Here we learn ho to do the two common types: Chi-square tests with "contingency tables" and Chi-square tests comparing expected and observed frequencies.  
+  Chi-square tests are widely used to test assumptions about the distribution of counts (frequencies) of observations in different categories. Here we learn ho to do the two common types: Chi-square tests with "contingency tables" and Chi-square tests comparing expected and observed frequencies
 ---
 
 ```{r setup, include=FALSE}
+
 library(learnr)
+
 knitr::opts_chunk$set(echo = TRUE, comment = NA, fig.width = 5, fig.height = 5)
 
 plague <- matrix(data = c(158, 81, 331, 549), nrow = 2)
@@ -35,7 +37,7 @@ This video has an explanation of the basic principles behind the chi-square test
 
 Many people think that bubonic plague is a disease of the past and not something to worry about today. This is not, in fact, the case: plague still infects people in many parts of the world, including Southern and Central Africa, South America, the USA and South-East Asia. As is commonly known, the causative agent of plague is the bacterium *Yersinia pestis*, which is transmitted to humans when they are bitten by rat fleas which are themselves infected. Rat fleas don't just bite rats, and a number of rodent species are implicated as plague hosts which can lead to transmission to humans, so it's important to undrstand how rodent communities relate to plague incidence in people.
 
-As part of a study of plague incidence in China Zhe Sun and a large group of coworkers^1^ assembled a dataset of recorded plague cases from the beginning of the "third pandemic" of bubonic plague in the late 18th Century until the 1960s. They divided China into 1119 1º grid cells and classified each one as either having plague present (239) or absent (880). Each cell was then further classified as having a high-diversity (> average number of species) or low diversity (< average number of species) of rodents which were indicated as being likely plague hosts by a separate analysis. This gives us a table of data which looks like this:
+As part of a study of plague incidence in China Zhe Sun and a large group of coworkers^1^ assembled a dataset of recorded plague cases from the beginning of the "third pandemic" of bubonic plague in the late 18th Century until the 1960s. They divided China into 1119 1º grid cells and classified each one as either having plague present (239) or absent (880). Each cell was then further classified as having a high-diversity (\> average number of species) or low diversity (\< average number of species) of rodents which were indicated as being likely plague hosts by a separate analysis. This gives us a table of data which looks like this:
 
 ```{r}
 plague <- matrix(data = c(158, 81, 331, 549), nrow = 2)
@@ -49,8 +51,7 @@ Just looking at the table we can see that the proportion of grid squares with pl
 
 To do this, we firstly calculate the expected values for each cell. These are the values that we would predict if there were no association between rodent diversity and plague presence. The expected value for each cell is:
 
-$$Expected\: value = \frac{Column\: total \times Row\: total}{Grand\: total}$$
-We can calculate these easily and then assemble our full *contingency table*.
+$$Expected\: value = \frac{Column\: total \times Row\: total}{Grand\: total}$$ We can calculate these easily and then assemble our full *contingency table*.
 
 ```{r}
 Col_totals <- colSums(plague)
@@ -115,10 +116,10 @@ plague - plague_expected
 
 Those numbers look rather large, which might indicate that the observed counts of grid cells are not distributed as we would expect with no association. What we need to do is to convert these differences between observed and expected frequencies into a value which summarises how different our observed frequencies are from the expected values, and which would be distributed on a probability distribution that we can use to assess how likely or unlikely we would be to see this sort of difference simply from sampling error. We do this by calculating a chi-square value (AKA a $\chi^2$ value) as follows:
 
-$$\chi^2 = \sum{\frac{\left(observed - expected\right)^2}{expected}}$$
-In other words, we take those differences between the observed and expected values that we calculated above, we square them, divide each one by the appropriate expected value and then add all of the values we've calculated together.
+$$\chi^2 = \sum{\frac{\left(observed - expected\right)^2}{expected}}$$ In other words, we take those differences between the observed and expected values that we calculated above, we square them, divide each one by the appropriate expected value and then add all of the values we've calculated together.
 
-Here's some code to do this. See if you can fill in the parts marked XXXXX. 
+Here's some code to do this. See if you can fill in the parts marked XXXXX.
+
 ```{r chisq1, exercise = TRUE, exercise.lines = 10}
 
 # Calculate differences between observed and expected
@@ -137,7 +138,6 @@ chisq_test <- XXXXX(chisq1)
 # Print result
 cat("The calculated value of chi-square is", chisq_test)
 ```
-
 
 ```{r chisq1-hint-1}
 # Use the sum() function to add everything together
@@ -166,7 +166,7 @@ chisq_test <- sum(chisq1)
 cat("The calculated value of chi-square is", chisq_test)
 ```
 
-OK. We've calculated our test statistic. If the null hypothesis of no association were to be true and we sampled thousands of times from the same data and calculated htis value, it's distribution would follow the theoretical chi-square distribution on a certain number of degrees of freedom. For a chisquare test calculated on a contingency table, as we have done, the degrees of freedom are equal to the number of rows -1 times the number of columns -1. Since we have two rows and two columns that gives us (2-1) * (2-1) df, which is equal to 1. 
+OK. We've calculated our test statistic. If the null hypothesis of no association were to be true and we sampled thousands of times from the same data and calculated htis value, it's distribution would follow the theoretical chi-square distribution on a certain number of degrees of freedom. For a chisquare test calculated on a contingency table, as we have done, the degrees of freedom are equal to the number of rows -1 times the number of columns -1. Since we have two rows and two columns that gives us (2-1) \* (2-1) df, which is equal to 1.
 
 Now that we know our test statistic, and we now how we would expect it to be distributed were the null hypothesis true, we can ask how likely we would be to see a value as big, or bigger, than the number we've calculated.
 
@@ -202,14 +202,20 @@ chisq.test(plague)$residuals
 
 Here, positive values indicate that there is a positive association: so cells with plague present are strongly associated with high rodent diversity, and cells without plague are associated more weakly with low rodent diversity. Negative values indicate the opposite, so low rodent diversity is strongly negatively associated with the presence of plague and high rodent diversity is more weakly negatively associated with the absence of plague.
 
+<br><br>
+
+<hr>
+
+1.  Sun, Z., Xu, L., Schmid, B.V., Dean, K.R., Zhang, Z., Xie, Y., Fang, X., Wang, S., Liu, Q., Lyu, B., Wan, X., Xu, J., Stenseth, N.C. & Xu, B. (2019) Human plague system associated with rodent diversity and other environmental factors. Royal Society open science, 6, 190216.
+
+## Habitat preferences in a reef fish
+
+Many reef fish have larval stages which develop in open water and only settle onto a reef as they develop towards adulthood. As part of this process they make choices about where to settle based on sensory cues that might include both visual and olfactory components. To try to understand this process, John Majoris and co-workers published a study in 2018^2^ in which they tested the habitat preferences of young neon gobies *Elacatinus lori* on the barrier reef in Belize. Adult *E. lori* live inside tube sponges, and Majoris *et al.* collected freshly settled *E. lori* individuals and carried out a series of choice tests to examine how they choose sponges to settle in.
+
+![](https://github.com/rjknell/Basic_stats/raw/master/inst/tutorials/Basic%20Analysis%203:%20Chi-square%20tests/E_lori.png){width="600"}
 
 
 
 <br><br><hr>
-1. Sun, Z., Xu, L., Schmid, B.V., Dean, K.R., Zhang, Z., Xie, Y., Fang, X., Wang, S., Liu, Q., Lyu, B., Wan, X., Xu, J., Stenseth, N.C. & Xu, B. (2019) Human plague system associated with rodent diversity and other environmental factors. Royal Society open science, 6, 190216.
 
-
-
-## Habitat preferences in a reef fish
-
-Many reef fish have larval stages which develop in open water and only settle onto a reef as they develop towards adulthood. As part of this process they make choices about where to settle based on sensory cues that might include both visual and olfactory components. To try to understand this process, John Majoris and co-workers published a study in 2018^2^ in which they tested the habitat preferences of young neon gobies *Elacatinus lori* on the barrier reef in Belize. Adult *E. lori* live inside tube sponges, and Majoris *et al.*
+2\. Majoris, J.E., D'Aloia, C.C., Francis, R.K. & Buston, P.M. (2018) Differential persistence favors habitat preferences that determine the distribution of a reef fish. *Behavioral ecology: official journal of the International Society for Behavioral Ecology*, **29**, 429--439.
