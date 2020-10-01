@@ -1,0 +1,215 @@
+---
+title: "Basic Analysis 3: Chi-square tests"
+output: 
+  learnr::tutorial:
+    progressive: false
+    theme: cerulean
+    highlight: pygments
+    css: css/test.css
+    code_folding: hide
+runtime: shiny_prerendered
+author: Rob Knell
+description: >
+  Chi-square tests are widely used to test assumptions about the distribution of counts (frequencies) of observations in different categories. Here we learn ho to do the two common types: Chi-square tests with "contingency tables" and Chi-square tests comparing expected and observed frequencies.  
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE, comment = NA, fig.width = 5, fig.height = 5)
+
+plague <- matrix(data = c(158, 81, 331, 549), nrow = 2)
+colnames(plague) <- c("Plague present", "Plague absent")
+rownames(plague) <- c("High diversity", "Low diversity")
+
+
+plague_expected <- matrix(data = c(104.4424, 134.5576, 384.5576, 495.4424), nrow = 2)
+colnames(plague_expected) <- c("Plague present", "Plague absent")
+rownames(plague_expected) <- c("High diversity", "Low diversity")
+```
+
+## Chi-square tests explained
+
+This video has an explanation of the basic principles behind the chi-square test, illustrated with a reanalysis of a very important dataset.
+
+## Bubonic plague and rodent diversity in China
+
+Many people think that bubonic plague is a disease of the past and not something to worry about today. This is not, in fact, the case: plague still infects people in many parts of the world, including Southern and Central Africa, South America, the USA and South-East Asia. As is commonly known, the causative agent of plague is the bacterium *Yersinia pestis*, which is transmitted to humans when they are bitten by rat fleas which are themselves infected. Rat fleas don't just bite rats, and a number of rodent species are implicated as plague hosts which can lead to transmission to humans, so it's important to undrstand how rodent communities relate to plague incidence in people.
+
+As part of a study of plague incidence in China Zhe Sun and a large group of coworkers^1^ assembled a dataset of recorded plague cases from the beginning of the "third pandemic" of bubonic plague in the late 18th Century until the 1960s. They divided China into 1119 1º grid cells and classified each one as either having plague present (239) or absent (880). Each cell was then further classified as having a high-diversity (> average number of species) or low diversity (< average number of species) of rodents which were indicated as being likely plague hosts by a separate analysis. This gives us a table of data which looks like this:
+
+```{r}
+plague <- matrix(data = c(158, 81, 331, 549), nrow = 2)
+colnames(plague) <- c("Plague present", "Plague absent")
+rownames(plague) <- c("High diversity", "Low diversity")
+
+print(plague)
+```
+
+Just looking at the table we can see that the proportion of grid squares with plague recorded as present is higher in the high diversity than the low diversity squares. This suggests that there is some association between rodent species diversity and the presence of plague, but we have little idea of how likely it is that this apparent association could have arisen by random chance. To test the idea that this apparent association is simply a product of sampling error, we can do a chi-square test.
+
+To do this, we firstly calculate the expected values for each cell. These are the values that we would predict if there were no association between rodent diversity and plague presence. The expected value for each cell is:
+
+$$Expected\: value = \frac{Column\: total \times Row\: total}{Grand\: total}$$
+We can calculate these easily and then assemble our full *contingency table*.
+
+```{r}
+Col_totals <- colSums(plague)
+Row_totals <- rowSums(plague)
+Grand_total <- sum(plague)
+
+plague2 <- cbind(plague, Row_totals)
+plague2 <- rbind(plague2, c(Col_totals, Grand_total))
+
+colnames(plague2)[3] <- "Totals"
+rownames(plague2)[3] <- "Totals"
+                
+print(plague2)
+```
+
+Now we can generate a new matrix with the calculated expected values for each cell. There are some blanks in the code indicated by XXXXX - try to fill them in.
+
+```{r exp_matrix, exercise = TRUE, exercise.lines = 12}
+
+# Generate vector of data
+plague_expect <- c(239 * 489/1119, # top left hand
+                     XXXXX * 630/1119, # bottom left hand
+                     880 * 489/XXXXX, # top right hand
+                     XXXXX * XXXXX/1119) # bottom right hand
+
+# Make it into a 2x2 matrix
+plague_expected <- matrix(plague_expect, nrow = 2)
+
+colnames(plague_expected) <- c("Plague present", "Plague absent")
+rownames(plague_expected) <- c("High diversity", "Low diversity")
+
+print(plague_expected)
+```
+
+```{r exp_matrix-hint-1}
+# You can find all the relevant numbers in the row and column totals of the plague2 matrix
+```
+
+```{r exp_matrix-hint-2}
+# This is the solution
+
+# Generate vector of data
+plague_expect <- c(239 * 489/1119, # top left hand
+                     239 * 630/1119, # bottom left hand
+                     880 * 489/1119, # top right hand
+                     880 * 630/1119) # bottom right hand
+
+# Make it into a 2x2 matrix
+plague_expected <- matrix(plague_expect, nrow = 2)
+
+colnames(plague_expected) <- c("Plague present", "Plague absent")
+rownames(plague_expected) <- c("High diversity", "Low diversity")
+
+print(plague_expected)
+```
+
+Now we have the expected values as well as the observed values. If there were no association between plague presence and rodent diversity then our expected values should be roughly equal to our observed values: in other words, our observed values minus our expected values should be roughly equal to zero for each cell in the table. Are they?
+
+```{r}
+plague - plague_expected
+```
+
+Those numbers look rather large, which might indicate that the observed counts of grid cells are not distributed as we would expect with no association. What we need to do is to convert these differences between observed and expected frequencies into a value which summarises how different our observed frequencies are from the expected values, and which would be distributed on a probability distribution that we can use to assess how likely or unlikely we would be to see this sort of difference simply from sampling error. We do this by calculating a chi-square value (AKA a $\chi^2$ value) as follows:
+
+$$\chi^2 = \sum{\frac{\left(observed - expected\right)^2}{expected}}$$
+In other words, we take those differences between the observed and expected values that we calculated above, we square them, divide each one by the appropriate expected value and then add all of the values we've calculated together.
+
+Here's some code to do this. See if you can fill in the parts marked XXXXX. 
+```{r chisq1, exercise = TRUE, exercise.lines = 10}
+
+# Calculate differences between observed and expected
+differences <- plague - plague_expected
+
+# Square them
+differences_squared <- XXXXX
+
+# Divide by the expected values
+chisq1 <- differences_squared/XXXXX
+
+# Calculate Chi-square test statistic
+
+chisq_test <- XXXXX(chisq1)
+
+# Print result
+cat("The calculated value of chi-square is", chisq_test)
+```
+
+
+```{r chisq1-hint-1}
+# Use the sum() function to add everything together
+# 
+# To square each value in a vector or a matrix, use
+# name^2
+```
+
+```{r chisq1-hint-2}
+# This is the solution:
+
+# Calculate differences between observed and expected
+differences <- plague - plague_expected
+
+# Square them
+differences_squared <- differences^2
+
+# Divide by the expected values
+chisq1 <- differences_squared/plague_expected
+
+# Calculate Chi-square test statistic
+
+chisq_test <- sum(chisq1)
+
+# Print result
+cat("The calculated value of chi-square is", chisq_test)
+```
+
+OK. We've calculated our test statistic. If the null hypothesis of no association were to be true and we sampled thousands of times from the same data and calculated htis value, it's distribution would follow the theoretical chi-square distribution on a certain number of degrees of freedom. For a chisquare test calculated on a contingency table, as we have done, the degrees of freedom are equal to the number of rows -1 times the number of columns -1. Since we have two rows and two columns that gives us (2-1) * (2-1) df, which is equal to 1. 
+
+Now that we know our test statistic, and we now how we would expect it to be distributed were the null hypothesis true, we can ask how likely we would be to see a value as big, or bigger, than the number we've calculated.
+
+We can do this with the `pchisq()` function as follows:
+
+```{r}
+pchisq(q=62, df=1, lower.tail=FALSE)
+```
+
+This is the p-value for our chi-square test. As you can see it's a very small number indeed, indicating that the probability of finding the pattern in the data that we have observed by sampling error alone is very, very small indeed.
+
+Unsurprisingly, R has a built-in function that will do a chi-square test for you so you don't have to go through the calculations we did above. The function is `chisq.test()` and if you give it a matrix as an argument it will carry out a chi-square test for a contingency table. The only difference is that if the matrix is a 2x2 matrix, as ours is, R will automatically apply something called *Yates' Correction for Continuity*. This is an adjustment to the calculation to take account for the way that some of the assumptions about how the test works don't really work perfectly with 2x2 tables, especially when one or more cells in the table has an expected value of 5 or less.
+
+This analysis doesn't really need Yates' correction because the expected values are all high but it doesn't make a lot of difference to the final result. See if you can get R to do a chi-square test. You just need to use the `chisq.test()` function with the `plague` matrix as the only argument.
+
+```{r chisquare_test1, exercise = TRUE}
+
+```
+
+```{r chisquare_test1-solution}
+# This is the solution
+
+chisq.test(plague)
+```
+
+You can see that Yates' correction makes the chi-square value slightly different, and also the p-value but the differences are small and the overall conclusion is the same: the apparent association between rodent diversity and plague, with grid squares more likely to have plague when rodent diversity is high, is very unlikely to have arisen by chance.
+
+To help us further interpret this analysis, we can ask R to tell us the *residuals* from the chi-square test. In the case of this particular analysis, the residuals are the difference between the expected and observed values, adjusted by dividing by the square root of the expected value. This adjusts the the observed - expected values by the sample size and these residuals can tell us about which cells in the table contribute the most to the overall result.
+
+```{r}
+chisq.test(plague)$residuals
+```
+
+Here, positive values indicate that there is a positive association: so cells with plague present are strongly associated with high rodent diversity, and cells without plague are associated more weakly with low rodent diversity. Negative values indicate the opposite, so low rodent diversity is strongly negatively associated with the presence of plague and high rodent diversity is more weakly negatively associated with the absence of plague.
+
+
+
+
+<br><br><hr>
+1. Sun, Z., Xu, L., Schmid, B.V., Dean, K.R., Zhang, Z., Xie, Y., Fang, X., Wang, S., Liu, Q., Lyu, B., Wan, X., Xu, J., Stenseth, N.C. & Xu, B. (2019) Human plague system associated with rodent diversity and other environmental factors. Royal Society open science, 6, 190216.
+
+
+
+## Habitat preferences in a reef fish
+
+Many reef fish have larval stages which develop in open water and only settle onto a reef as they develop towards adulthood. As part of this process they make choices about where to settle based on sensory cues that might include both visual and olfactory components. To try to understand this process, John Majoris and co-workers published a study in 2018^2^ in which they tested the habitat preferences of young neon gobies *Elacatinus lori* on the barrier reef in Belize. Adult *E. lori* live inside tube sponges, and Majoris *et al.*
