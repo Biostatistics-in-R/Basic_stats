@@ -16,6 +16,8 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 knitr::opts_chunk$set(echo = TRUE, comment = NA, fig.width = 5, fig.height = 5)
+
+mhc <- read.csv("https://github.com/rjknell/Basic_stats/raw/master/data/manczinger_2019.csv")
 ```
 
 ## Correlation analysis explained
@@ -24,4 +26,161 @@ The video embedded here explains the way that we can calculate a correlation coe
 
 ## MHC promiscuity and pathogen diversity
 
-The major Histocompatibility complex (MHC) is a region of the vertebrate genome encoding cell-surface proteins that are important in the recognition of foreign organisms such as bacteria and viruses by the immune system.
+The major Histocompatibility complex (MHC) is a region of the vertebrate genome encoding cell-surface proteins that are important in the recognition of foreign organisms such as bacteria and viruses by the immune system. Within humans, there is considerable genetic diversity in the alleles that encode for the MHC. One possible explanation for this is that t is driven by host-pathogen interactions, and one aspect of this that could be important is the variety of antigens which a particular MHC allele can bind to, with more "promiscuous" alleles being able to promote immune activity against a broader range of pathogens and so being more generalist. If these generalist alleles are favoured in regions of high pathogen diversity this could explain some of the geographical variation that is known to exist in MHC alleles. Máté Manczinger and co-workers tested this idea in a paper published in 2019^1^. They collected allele prevalence data for the HLA-DRB1 MHC gene from a number of populations worldwide and used two methods to estimate the promiscuity for the gene for each population: firstly, they used bioinformatics techniques to predict the binding affinities for the alleles in question, and secondly they used empirical data on MHC binding *in vitro,* giving two separate measures. For each population they were then able to calculate the pathogen richness in the corresponding geographical area using publicly available data on the prevalence 168 extracellular pathogens (bacteria, fungi, protists and helminths). They also calculated similar data for intracellular pathogens such as viruses.
+
+Overall then, they generated two response variables, the predicted and the *in-vitro* promiscuity levels for the HLA-DRB1 gene, both of which are separate estimates of how broad the antigen binding capabilities are at a population level. They also generated two explanatory variables, extracellular pathogen diversity and intracelullar pathogen diversity. Since intracellular pathogens are not exposed to the aspects of the immune response associated with the MHC, the prediction to be tested is that HLA-DRB1 promiscuity should correlate with extracellular but not intracellular pathogen diversity.
+
+We can load the data into a data frame called `mhc`
+
+```{r eval = FALSE}
+mhc <- read.csv("https://github.com/rjknell/Basic_stats/raw/master/data/manczinger_2019.csv")
+```
+
+As always, we need to check our data have loaded properly. Use `str()` to check the structure of the dataset.
+
+```{r mhc_structure, exercise = TRUE}
+
+```
+
+```{r mhc_structure-solution}
+str(mhc)
+```
+
+All looks fine. `Intracellular` and `Extracellular` are the two pathogen diversity estimates. `Promiscuity_pred` is the predicted promiscuity from the bioinformatics study and `Promiscuity_in_vivo` is the promiscuity based on empirical lab tests. The units for promiscuity are abitrary because the values have been normalised, the units for pathogen diversity are in numbers of species. Some of the latter are fractional because of the way these were estimated.
+
+We'll start by looking at the predicted promiscuity, and whether this correlates with the extracellular pathogen diversity. As always, we'll start by drawing a graph and looking at the data. In this case a scatterplot is appropriate.
+
+```{r}
+plot(Promiscuity_pred ~ Extracellular,
+     data = mhc,
+     pch = 16,
+     col = "aquamarine4",
+     xlab = "Extracellular pathogen diversity (species)",
+     ylab = "Predicted population-level promiscuity")
+```
+
+**Figure 1** Estimated MHC promiscuity for 37 human populations plotted against the local diversity of extracellular pathogens.
+
+Looking at figure 1, we can see that there does indeed seem to be a general trend towards higher promiscuity in regions with higher pathogen diversity. It's fairly noisy, however, and it would be helpful to our understanding to firstly quantify how strong the relationship between the two variables is and secondly to ask how likely such a pattern would be to arise simply by sampling error. Let's start by calculating *r*, the correlation coefficient.
+
+The formula for *r* is somewhat intimidating:
+
+$$
+r = \left. \frac{\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}}{n-1} \right/s_xs_y,
+$$
+
+But can be broken down into more easily understood parts.
+
+$$
+\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}
+$$
+
+Is the sum of the differences between the $x$ and \$y\$ values and their respective means. If there is a positive correlation this will give a positive value and if a negative correlation it will give a negative value. This number is dependent on the sample size, however, with larger samples giving larger values for the same sort of relationship just because there is more data.
+
+$$
+\frac{\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}}{n-1} 
+$$
+
+Is this value divided by the *degrees of freedom* ($n-1$) which corrects for sample size. This value is called the *covariance*, but it's still not particularly useful here because it will vary depending on the scale that our data are measured on: if one of our variables was human height measured in mm, for example, we would get a larger for the covariance than if it were human height measured in m.
+
+$$
+r = \left. \frac{\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}}{n-1} \right/s_xs_y,
+$$
+
+is the covariance *standardised* by the product of the standard deviations of $x$ and \$y\$. This takes out the effect of scale, and gives us a value for the correlation coefficient (technically in this case *Pearson's product-moment correlation coefficient* but life's too short for names that long) that will always be between -1 and 1, with -1 indicating a perfect negative correlation, 0 indicating no correlation and +1 indicating a perfect positive correlation. Let's calculate \$r\$ for our data. See if you can fill in the bits marked with XXXXX.
+
+```{r correlation_1, exercise = TRUE, exercise.lines = 25}
+# Mean of x
+mean_x <- mean(mhc$Extracellular)
+
+# Mean of y
+mean_y <- XXXXX
+
+# Sample size
+n1 <- length(mhc$Extracellular)
+
+# Standard deviation of x
+sd_x <- sd(XXXXX)
+
+# Standard deviation of y
+sd_y <- sd(mhc$Promiscuity_pred)
+
+# Covariance
+covar_xy <- sum((mhc$Extracellular - mean_x) * XXXXX)/(XXXXX -1)
+
+# r
+r1 <- XXXXX/(sd_x * sd_y)
+
+# Print r
+
+cat("The correlation coefficient is", r1)
+```
+
+```{r correlation_1-hint-1}
+# Work your way methodically through the 
+# code, thinking about how it relates to 
+# the equations above.
+
+# Everything you need to know is there, 
+# you just need to be careful about which
+# variable is being used in each place.
+
+# Remember, the x variable is mhc$Extracellular and
+# the y variable is mhc$Promiscuity_pred
+
+# Finally, be careful with your brackets
+```
+
+```{r correlation_1-hint-2}
+# This is the solution
+
+# Mean of x
+mean_x <- mean(mhc$Extracellular)
+
+# Mean of y
+mean_y <- mean(mhc$Promiscuity_pred)
+
+# Sample size
+n1 <- length(mhc$Extracellular)
+
+# Standard deviation of x
+sd_x <- sd(mhc$Extracellular)
+
+# Standard deviation of y
+sd_y <- sd(mhc$Promiscuity_pred)
+
+# Covariance
+covar_xy <- sum((mhc$Extracellular - mean_x) * (mhc$Promiscuity_pred - mean_y))/(n1 -1)
+
+# r
+r1 <- covar_xy/(sd_x * sd_y)
+
+# Print r
+
+cat("The correlation coefficient is", r1)
+```
+
+Hopefully you've got a value of 0.517. This is about what we'd expect given what we can see in the plot: a medium-strength positive correlation. What about testing this for significance?
+
+You hopefully recall that when we calculate a *sample mean* $\bar{x}$ we are producing an estimate of the *population mean* $\mu$. In just the same way, the value of $r$ that we've calculated is the *sample correlation coefficient* and is an estimate of the *population correlation coefficient* $\rho$. The null hypothesis that we want to test in this case is that $\rho$ = 0. In other words, if the overall, population-level pattern was that there were no correlation, we want to know the probability of seeing a sample correlation coefficient as big as we did (or one even more extreme).
+
+When we were doing t-tests to compare two sample means, we calcluated the *effect* which was the difference between means, and we standardised it by dividing our value by a figure that meant that if the null hypothesis were true we would expect it to be distributed on a $t$ distribution, and having done that we could ask how liekly we would be to see the value that we observed if the null hypothesis of no difference were true. We can do the same with $r$, and in fact we can calculate a value based on $r$ that we would expect to follow a t-distribution if the null hypothesis were true. This is calculated as:
+
+$$
+t = \frac{r \sqrt{n-2}}{\sqrt{1-r^2}}, 
+$$
+and if the null hypothesis were true we would expect it to be distributed on a $t$ distribution with $n-2$ degrees of freedom.
+
+We know that r = 0.517 and n = 37, so try to calculate t:
+```{r t_1, exercise = TRUE}
+
+t1 <- 0.517*sqrt(XXXXX - XXXXX) / sqrt(1 - XXXXX^2)
+  
+cat("The value of t is", t1)
+```
+
+<br><br>
+
+<hr>
+
+1\. Manczinger, M., Boross, G., Kemény, L., Müller, V., Lenz, T.L., Papp, B. & Pál, C. (2019) Pathogen diversity drives the evolution of generalist MHC-II alleles in human populations. *PLoS biology*, **17**, e3000131.
