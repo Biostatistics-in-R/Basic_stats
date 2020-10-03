@@ -28,7 +28,7 @@ The video embedded here explains the way that we can calculate a correlation coe
 
 The major Histocompatibility complex (MHC) is a region of the vertebrate genome encoding cell-surface proteins that are important in the recognition of foreign organisms such as bacteria and viruses by the immune system. Within humans, there is considerable genetic diversity in the alleles that encode for the MHC. One possible explanation for this is that t is driven by host-pathogen interactions, and one aspect of this that could be important is the variety of antigens which a particular MHC allele can bind to, with more "promiscuous" alleles being able to promote immune activity against a broader range of pathogens and so being more generalist. If these generalist alleles are favoured in regions of high pathogen diversity this could explain some of the geographical variation that is known to exist in MHC alleles. Máté Manczinger and co-workers tested this idea in a paper published in 2019^1^. They collected allele prevalence data for the HLA-DRB1 MHC gene from a number of populations worldwide and used two methods to estimate the promiscuity for the gene for each population: firstly, they used bioinformatics techniques to predict the binding affinities for the alleles in question, and secondly they used empirical data on MHC binding *in vitro,* giving two separate measures. For each population they were then able to calculate the pathogen richness in the corresponding geographical area using publicly available data on the prevalence 168 extracellular pathogens (bacteria, fungi, protists and helminths). They also calculated similar data for intracellular pathogens such as viruses.
 
-Overall then, they generated two response variables, the predicted and the *in-vitro* promiscuity levels for the HLA-DRB1 gene, both of which are separate estimates of how broad the antigen binding capabilities are at a population level. They also generated two explanatory variables, extracellular pathogen diversity and intracelullar pathogen diversity. Since intracellular pathogens are not exposed to the aspects of the immune response associated with the MHC, the prediction to be tested is that HLA-DRB1 promiscuity should correlate with extracellular but not intracellular pathogen diversity.
+We'll look at one of their two response variables the *in-vitro* promiscuity levels for the HLA-DRB1 gene, an estimate of how broad the antigen binding capabilities are at a population level. There are two explanatory variables, extracellular pathogen diversity and intracelullar pathogen diversity. Since intracellular pathogens are not exposed to the aspects of the immune response associated with the MHC, the prediction to be tested is that HLA-DRB1 promiscuity should correlate with extracellular but not intracellular pathogen diversity.
 
 We can load the data into a data frame called `mhc`
 
@@ -48,9 +48,12 @@ str(mhc)
 
 All looks fine. `Intracellular` and `Extracellular` are the two pathogen diversity estimates. `Promiscuity_pred` is the predicted promiscuity from the bioinformatics study and `Promiscuity_in_vivo` is the promiscuity based on empirical lab tests. The units for promiscuity are abitrary because the values have been normalised, the units for pathogen diversity are in numbers of species. Some of the latter are fractional because of the way these were estimated.
 
-We'll start by looking at the predicted promiscuity, and whether this correlates with the extracellular pathogen diversity. As always, we'll start by drawing a graph and looking at the data. In this case a scatterplot is appropriate.
+We're focussing on the *in-vitro* promiscuity, and whether this correlates with the extracellular  and intracellular pathogen diversities. As always, we'll start by drawing a graph and looking at the data. In this case a pair of scatterplots is appropriate. The code for the first plot, *in vitro* promiscuity versus extracellular diversity, is done, but the code for *in vitro* promiscuity versus intracellular diversity needs to be added.
 
-```{r}
+```{r correlation_plot_1, exercise = TRUE, exercise.lines = 20, fig.width = 6}
+# Draw two plots side-by-side
+par(mfrow = c(1,2))
+
 plot(Promiscuity_pred ~ Extracellular,
      data = mhc,
      pch = 16,
@@ -59,9 +62,50 @@ plot(Promiscuity_pred ~ Extracellular,
      ylab = "Predicted population-level promiscuity")
 ```
 
-**Figure 1** Estimated MHC promiscuity for 37 human populations plotted against the local diversity of extracellular pathogens.
+```{r correlation_plot_1-hint-1}
+# You can use the code for the first plot
+# You need to change the name of the x-variable
+# and the x-axis label
+```
 
-Looking at figure 1, we can see that there does indeed seem to be a general trend towards higher promiscuity in regions with higher pathogen diversity. It's fairly noisy, however, and it would be helpful to our understanding to firstly quantify how strong the relationship between the two variables is and secondly to ask how likely such a pattern would be to arise simply by sampling error. Let's start by calculating *r*, the correlation coefficient.
+```{r correlation_plot_1-hint-2}
+# This is the solution
+
+# Draw two plots side-by-side
+par(mfrow = c(1,2))
+
+plot(Promiscuity_pred ~ Extracellular,
+     data = mhc,
+     pch = 16,
+     col = "aquamarine4",
+     xlab = "Extracellular pathogen diversity (species)",
+     ylab = "Predicted population-level promiscuity")
+
+plot(Promiscuity_pred ~ Intracellular,
+     data = mhc,
+     pch = 16,
+     col = "aquamarine4",
+     xlab = "Intracellular pathogen diversity (species)",
+     ylab = "Predicted population-level promiscuity")
+```
+
+**Figure 1** Estimated MHC promiscuity for 37 human populations plotted against the local diversity of extracellular and intracellular pathogens.
+
+Looking at figure 1, we can see that there does indeed seem to be a general trend towards higher antigen binding promiscuity in regions with higher pathogen diversity. It's fairly noisy, however, and it would be helpful to our understanding to firstly quantify how strong the relationship between the two variables is and secondly to ask how likely such a pattern would be to arise simply by sampling error.
+
+
+
+
+<br><br>
+
+<hr>
+
+1\. Manczinger, M., Boross, G., Kemény, L., Müller, V., Lenz, T.L., Papp, B. & Pál, C. (2019) Pathogen diversity drives the evolution of generalist MHC-II alleles in human populations. *PLoS biology*, **17**, e3000131.
+
+
+## Calculating the correlation coefficient
+
+Let's start by calculating *r*, the correlation coefficient.
 
 The formula for *r* is somewhat intimidating:
 
@@ -162,16 +206,20 @@ cat("The correlation coefficient is", r1)
 
 Hopefully you've got a value of 0.517. This is about what we'd expect given what we can see in the plot: a medium-strength positive correlation. What about testing this for significance?
 
+## Testing $r$ for significance
+
 You hopefully recall that when we calculate a *sample mean* $\bar{x}$ we are producing an estimate of the *population mean* $\mu$. In just the same way, the value of $r$ that we've calculated is the *sample correlation coefficient* and is an estimate of the *population correlation coefficient* $\rho$. The null hypothesis that we want to test in this case is that $\rho$ = 0. In other words, if the overall, population-level pattern was that there were no correlation, we want to know the probability of seeing a sample correlation coefficient as big as we did (or one even more extreme).
 
-When we were doing t-tests to compare two sample means, we calcluated the *effect* which was the difference between means, and we standardised it by dividing our value by a figure that meant that if the null hypothesis were true we would expect it to be distributed on a $t$ distribution, and having done that we could ask how liekly we would be to see the value that we observed if the null hypothesis of no difference were true. We can do the same with $r$, and in fact we can calculate a value based on $r$ that we would expect to follow a t-distribution if the null hypothesis were true. This is calculated as:
+When we were doing t-tests to compare two sample means, we calculated the *effect* which was the difference between means, and we standardised it by dividing our value by a figure that meant that if the null hypothesis were true we would expect it to be distributed on a $t$ distribution. Having done that we could ask how likely we would be to see the value that we observed if the null hypothesis of no difference were true. We can do the same with $r$, and in fact we can calculate a value based on $r$ that we would expect to follow a t-distribution if the null hypothesis were true. This is calculated as:
 
 $$
 t = \frac{r \sqrt{n-2}}{\sqrt{1-r^2}}, 
-$$
+$$ 
+
 and if the null hypothesis were true we would expect it to be distributed on a $t$ distribution with $n-2$ degrees of freedom.
 
-We know that r = 0.517 and n = 37, so try to calculate t:
+We know that r = 0.517 and n = 37, so try to calculate t.
+
 ```{r t_1, exercise = TRUE}
 
 t1 <- 0.517*sqrt(XXXXX - XXXXX) / sqrt(1 - XXXXX^2)
@@ -179,8 +227,22 @@ t1 <- 0.517*sqrt(XXXXX - XXXXX) / sqrt(1 - XXXXX^2)
 cat("The value of t is", t1)
 ```
 
-<br><br>
+```{r t_1-solution}
+# This is the solution
+t1 <- 0.517*sqrt(37 - 2) / sqrt(1 - 0.517^2)
+  
+cat("The value of t is", t1)
+```
+All we need to do now is to calculate the probability of observing a value of of 3.573 or higher on a *t* distribution with 35 degrees of freedom.
+```{r}
+2*pt(3.573, 35, lower.tail = FALSE)
+```
 
-<hr>
+So p = 0.0011.
 
-1\. Manczinger, M., Boross, G., Kemény, L., Müller, V., Lenz, T.L., Papp, B. & Pál, C. (2019) Pathogen diversity drives the evolution of generalist MHC-II alleles in human populations. *PLoS biology*, **17**, e3000131.
+Of course, R has a built in function to do this analysis, namely `cor.test()`. All you have to do is to give it the names of the two variables in question and it'll do the rest.
+
+```{r}
+cor.test(mhc$Promiscuity_pred, mhc$Extracellular)
+```
+This gives us the value of $r$ at the bottom, labelled `cor`, 95% confidence intervals for our estimate of $r$ (which we didn't calculate)and further up the results the output of the t-test for significance. You can see that the values here are the same as the ones we calculated, give or take a little rounding error. 
