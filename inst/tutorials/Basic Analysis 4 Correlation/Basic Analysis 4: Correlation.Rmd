@@ -48,50 +48,49 @@ str(mhc)
 
 All looks fine. `Intracellular` and `Extracellular` are the two pathogen diversity estimates. `Promiscuity_pred` is the predicted promiscuity from the bioinformatics study and `Promiscuity_in_vivo` is the promiscuity based on empirical lab tests. The units for promiscuity are abitrary because the values have been normalised, the units for pathogen diversity are in numbers of species. Some of the latter are fractional because of the way these were estimated.
 
-We're focussing on the *in-vitro* promiscuity, and whether this correlates with the extracellular  and intracellular pathogen diversities. As always, we'll start by drawing a graph and looking at the data. In this case a pair of scatterplots is appropriate. The code for the first plot, *in vitro* promiscuity versus extracellular diversity, is done, but the code for *in vitro* promiscuity versus intracellular diversity needs to be added.
+We're focussing on the *in-vitro* promiscuity, and whether this correlates with the extracellular  and intracellular pathogen diversities. As always, we'll start by drawing a graph and looking at the data. In this case, with two variables which are both continuous data, scatterplots are appropriate. Here is the first one, with *in-vitro* promiscuity plotted against extracellular pathogen diversity.
 
-```{r correlation_plot_1, exercise = TRUE, exercise.lines = 20, fig.width = 6}
-# Draw two plots side-by-side
-par(mfrow = c(1,2))
-
-plot(Promiscuity_pred ~ Extracellular,
+```{r correlation_plot_1}
+plot(Promiscuity_in_vitro ~ Extracellular,
      data = mhc,
      pch = 16,
      col = "aquamarine4",
      xlab = "Extracellular pathogen diversity (species)",
-     ylab = "Predicted population-level promiscuity")
+     ylab = "Population-level promiscuity")
 ```
 
-```{r correlation_plot_1-hint-1}
+**Figure 1** *In-vitro* MHC promiscuity for 28 human populations plotted against the local diversity of extracellular pathogens.
+
+Looking at figure 1, we can see that there does indeed seem to be a general trend towards higher antigen binding promiscuity in regions with higher pathogen diversity.
+
+Now for the intracellular pathogen diversity. See if you can adapt the code above to draw a new plot
+
+```{r correlation_plot_2, exercise = TRUE, exercise.lines = 20, fig.width = 6}
+
+
+```
+
+```{r correlation_plot_2-hint-1}
 # You can use the code for the first plot
 # You need to change the name of the x-variable
 # and the x-axis label
 ```
 
-```{r correlation_plot_1-hint-2}
+```{r correlation_plot_2-hint-2}
 # This is the solution
 
-# Draw two plots side-by-side
-par(mfrow = c(1,2))
-
-plot(Promiscuity_pred ~ Extracellular,
-     data = mhc,
-     pch = 16,
-     col = "aquamarine4",
-     xlab = "Extracellular pathogen diversity (species)",
-     ylab = "Predicted population-level promiscuity")
-
-plot(Promiscuity_pred ~ Intracellular,
+plot(Promiscuity_in_vitro ~ Intracellular,
      data = mhc,
      pch = 16,
      col = "aquamarine4",
      xlab = "Intracellular pathogen diversity (species)",
-     ylab = "Predicted population-level promiscuity")
+     ylab = "Population-level promiscuity")
 ```
 
-**Figure 1** Estimated MHC promiscuity for 37 human populations plotted against the local diversity of extracellular and intracellular pathogens.
+**Figure 2**. *In-vitro* MHC promiscuity for 28 human populations plotted against the local diversity of intracellular pathogens.
 
-Looking at figure 1, we can see that there does indeed seem to be a general trend towards higher antigen binding promiscuity in regions with higher pathogen diversity. It's fairly noisy, however, and it would be helpful to our understanding to firstly quantify how strong the relationship between the two variables is and secondly to ask how likely such a pattern would be to arise simply by sampling error.
+
+Looking at this plot it's much harder to see any relationship between the two varaibles. In both the intra- and extracellular cases, however, the data are fairly noisy and it would be helpful to to firstly quantify how strong the relationship between the two variables is and secondly to ask how likely such a pattern would be to arise simply by sampling error.
 
 
 
@@ -103,9 +102,9 @@ Looking at figure 1, we can see that there does indeed seem to be a general tren
 1\. Manczinger, M., Boross, G., Kemény, L., Müller, V., Lenz, T.L., Papp, B. & Pál, C. (2019) Pathogen diversity drives the evolution of generalist MHC-II alleles in human populations. *PLoS biology*, **17**, e3000131.
 
 
-## Calculating the correlation coefficient
+## Calculating the correlation coefficient 
 
-Let's start by calculating *r*, the correlation coefficient.
+In this section we'll just consider the relationship between *in-vitro* promiscuity and extracellular pathogens. Let's start by calculating *r*, the correlation coefficient.
 
 The formula for *r* is somewhat intimidating:
 
@@ -113,7 +112,7 @@ $$
 r = \left. \frac{\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}}{n-1} \right/s_xs_y,
 $$
 
-But can be broken down into more easily understood parts.
+but it can be broken down into more easily understood parts.
 
 $$
 \Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}
@@ -140,14 +139,16 @@ mean_x <- mean(mhc$Extracellular)
 # Mean of y
 mean_y <- XXXXX
 
-# Sample size
-n1 <- length(mhc$Extracellular)
+# Sample size NB this is complicated because there
+# are some NA (missing values) in the data set
+n1 <- length(which(is.na(mhc$Promiscuity_in_vitro)== FALSE))
+
 
 # Standard deviation of x
 sd_x <- sd(XXXXX)
 
 # Standard deviation of y
-sd_y <- sd(mhc$Promiscuity_pred)
+sd_y <- sd(mhc$Promiscuity_in_vitro)
 
 # Covariance
 covar_xy <- sum((mhc$Extracellular - mean_x) * XXXXX)/(XXXXX -1)
@@ -182,19 +183,20 @@ cat("The correlation coefficient is", r1)
 mean_x <- mean(mhc$Extracellular)
 
 # Mean of y
-mean_y <- mean(mhc$Promiscuity_pred)
+mean_y <- mean(mhc$Promiscuity_in_vitro)
 
-# Sample size
-n1 <- length(mhc$Extracellular)
+# Sample size NB this is complicated because there
+# are some NA (missing values) in the data set
+n1 <- length(which(is.na(mhc$Promiscuity_in_vitro)== FALSE))
 
 # Standard deviation of x
 sd_x <- sd(mhc$Extracellular)
 
 # Standard deviation of y
-sd_y <- sd(mhc$Promiscuity_pred)
+sd_y <- sd(mhc$Promiscuity_in_vitro)
 
 # Covariance
-covar_xy <- sum((mhc$Extracellular - mean_x) * (mhc$Promiscuity_pred - mean_y))/(n1 -1)
+covar_xy <- sum((mhc$Extracellular - mean_x) * (mhc$Promiscuity_in_vitro - mean_y))/(n1 -1)
 
 # r
 r1 <- covar_xy/(sd_x * sd_y)
