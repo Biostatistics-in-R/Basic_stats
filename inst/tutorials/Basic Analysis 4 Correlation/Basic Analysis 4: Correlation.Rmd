@@ -21,6 +21,8 @@ mhc <- read.csv("https://github.com/rjknell/Basic_stats/raw/master/data/manczing
 
 The video embedded here explains the way that we can calculate a correlation coefficient, what it means and how to test for statistical significance.
 
+![](https://youtu.be/IDDbtfHByKw)
+
 ## MHC promiscuity and pathogen diversity
 
 The major Histocompatibility complex (MHC) is a region of the vertebrate genome encoding cell-surface proteins that are important in the recognition of foreign organisms such as bacteria and viruses by the immune system. Within humans, there is considerable genetic diversity in the alleles that encode for the MHC. One possible explanation for this is that t is driven by host-pathogen interactions, and one aspect of this that could be important is the variety of antigens which a particular MHC allele can bind to, with more "promiscuous" alleles being able to promote immune activity against a broader range of pathogens and so being more generalist. If these generalist alleles are favoured in regions of high pathogen diversity this could explain some of the geographical variation that is known to exist in MHC alleles. Máté Manczinger and co-workers tested this idea in a paper published in 2019^1^. They collected allele prevalence data for the HLA-DRB1 MHC gene from a number of populations worldwide and used two methods to estimate the promiscuity for the gene for each population: firstly, they used bioinformatics techniques to predict the binding affinities for the alleles in question, and secondly they used empirical data on MHC binding *in vitro,* giving two separate measures. For each population they were then able to calculate the pathogen richness in the corresponding geographical area using publicly available data on the prevalence 168 extracellular pathogens (bacteria, fungi, protists and helminths). They also calculated similar data for intracellular pathogens such as viruses.
@@ -127,7 +129,7 @@ $$
 r = \left. \frac{\Sigma{\left(x-\bar{x}\right) \left(y-\bar{y}\right)}}{n-1} \right/s_xs_y,
 $$
 
-is the covariance *standardised* by the product of the standard deviations of $x$ and \$y\$. This takes out the effect of scale, and gives us a value for the correlation coefficient (technically in this case *Pearson's product-moment correlation coefficient* but life's too short for names that long) that will always be between -1 and 1, with -1 indicating a perfect negative correlation, 0 indicating no correlation and +1 indicating a perfect positive correlation. Let's calculate \$r\$ for our data. See if you can fill in the bits marked with XXXXX.
+is the covariance *standardised* by the product of the standard deviations of $x$ and \$y\$. This takes out the effect of scale, and gives us a value for the correlation coefficient (technically in this case *Pearson's product-moment correlation coefficient* but life's too short for names that long) that will always be between -1 and 1, with -1 indicating a perfect negative correlation, 0 indicating no correlation and +1 indicating a perfect positive correlation. Let's calculate $r$ for our data. See if you can fill in the bits marked with XXXXX.
 
 ```{r correlation_1, exercise = TRUE, exercise.lines = 25}
 # Mean of x
