@@ -82,7 +82,7 @@ As you can see there is a lot of variability between the different graveyards, a
 
 To get some more insight into how confident we can be, we need to carry out a paired t-test. To emphasise where these numbers come from, we'll start by calculating our test statistics from first principles, for the ant data only. As a reminder, the way that a statistical hypothesis test works is that we first calculate the *effect*, which in this case is the mean of the differences between the control and shaded plots ($\bar{x}$). We then transform the effect so that it can be compared with the distribution that we would expect to see if the null hypothesis (in this case, H~0~ is that there is no difference between the control and shaded areas) were true. To do this for a paired sample t-test we divide by the *standard error*, which is the standard deviation ($s$) divided by the square root of the sample size ($n$).
 
-This gives us the formula for oour test statistic, *t*:
+This gives us the formula for our test statistic, *t*:
 
 $$ t = \frac{\bar{x}}{s / \sqrt{n}}. $$
 
@@ -181,9 +181,9 @@ As you can see, our value of *t* is within the area of the curve where we would 
 
 So the p-value for our paired-sample t-test is equal to 0.0627. This is slightly higher than the conventional cut-off for statistical significance of 0.05, telling us that we can have little confidence that the pattern we've observed is not simply a consequence of sampling error. In other words, the difference between the control and shaded plots is not statistically significant.
 
-In R we don't have to go through this process every time we do a t-test. Instead we can use the `t.test()` function. You need to tell it the name of the data (`ant_data$ants`), a tilde `~` and then the name of the factor separating the data into groups (`ant_data$treatment`). You then need another argument which is `paired = TRUE` so that R knows to do a paired t-test.
+### Paired t-test in R
 
-For a paired t-test, R assumes that the values to be treated as paired are in numerical order, so the first value for the control treatment is paired with the first value for the shaded treatment and so on. This is the case for our data but if you are doing this on your own data it's a good idea to check that this is indeed correct and if not to re-order your data.
+In R we don't have to go through this process every time we do a t-test. Instead we can use the `t.test()` function. You need to tell it the name of the data (`ant_data$ants`), a tilde `~` and then the name of the factor separating the data into groups (`ant_data$treatment`). You then need another argument which is `paired = TRUE` so that R knows to do a paired t-test.
 
 ```{r t_test1, exercise = TRUE}
 
@@ -206,6 +206,8 @@ t.test(ant_data$VARIABLE1 ~ ant_data$VARIABLE2, paired = TRUE)
 
 t.test(ant_data$ants ~ ant_data$treatment, paired = TRUE)
 ```
+
+As an aside, for a paired t-test, R assumes that the values to be treated as paired are in numerical order, so the first value for the control treatment is paired with the first value for the shaded treatment and so on. This is the case for our data but if you are doing this on your own data it's a good idea to check that this is indeed correct and if not to re-order your data.
 
 This gives us quite a lot of information but if you look on the second row of the main block of output you can see the t-statistic, the df and the p-value, which should be the same as the values you calculated earlier. You also get a confidence interval, which is the confidence interval for the difference between means, and it also gives you the value of the mean difference between the values. You can see that the confidence interval for the difference between the means has a negative lower value and a positive higher value: in other words, our 95% confidence interval includes zero, which is another indicator that the difference between means is not statistically significant.
 
