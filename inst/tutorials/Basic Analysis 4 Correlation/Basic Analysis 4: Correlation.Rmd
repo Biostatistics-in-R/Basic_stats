@@ -393,3 +393,6 @@ cor.test(mhc$Promiscuity_in_vitro, mhc$Extracellular, method = "spearman")
 cor.test(mhc$Promiscuity_in_vitro, mhc$Intracellular, method = "spearman")
 ```
 R gives us a warning message because some of the ranks are tied, but this isn't really anything to worry about. You can see that (unsurprisingly) our main conclusions are not affected: there remains a good correlation between population-level MHC promiscuity and extracellular pathogen diversity which is signfiicant at a very low p-value. The relationship between population-level MHC promiscuity and intracellular pathogen diversity is weak at best and certainly not statistically significant.
+
+<br><br><hr>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
