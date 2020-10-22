@@ -269,3 +269,6 @@ question("Which of the following statements are correct?",
 <br><br><hr>
 
 2\. Majoris, J.E., D'Aloia, C.C., Francis, R.K. & Buston, P.M. (2018) Differential persistence favors habitat preferences that determine the distribution of a reef fish. *Behavioral ecology: official journal of the International Society for Behavioral Ecology*, **29**, 429--439.
+
+<hr>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
